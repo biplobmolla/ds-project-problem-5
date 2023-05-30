@@ -91,6 +91,7 @@ void removeVoter(Line *line, int voterId, Line *voteCastedLine)
 
 void displayStatus(Line *lines, int numLines, Line *voteCastedLine)
 {
+    system("cls");
     printf("Polling Center Status:\n");
 
     for (int i = 0; i < numLines; i++)
