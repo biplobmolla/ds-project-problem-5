@@ -54,13 +54,34 @@ void addVoter(Line *line, int voterId)
     line->numVoters++;
 }
 
-void removeVoter(Line *line)
+void listVoter(int voterId, Line *voteCastedLine)
+{
+    Voter *newVoter = createVoter(voterId);
+
+    if (voteCastedLine->head == NULL)
+    {
+        voteCastedLine->head = newVoter;
+    }
+    else
+    {
+        Voter *current = voteCastedLine->head;
+        while (current->next != NULL)
+        {
+            current = current->next;
+        }
+        current->next = newVoter;
+    }
+
+    voteCastedLine->numVoters++;
+}
+
+void removeVoter(Line *line, int voterId, Line *voteCastedLine)
 {
     if (line->head == NULL)
     {
         return;
     }
-
+    listVoter(voterId, voteCastedLine);
     Voter *removedVoter = line->head;
     line->head = line->head->next;
     free(removedVoter);
@@ -68,7 +89,7 @@ void removeVoter(Line *line)
     line->numVoters--;
 }
 
-void displayStatus(Line *lines, int numLines)
+void displayStatus(Line *lines, int numLines, Line *voteCastedLine)
 {
     printf("Polling Center Status:\n");
 
@@ -89,6 +110,18 @@ void displayStatus(Line *lines, int numLines)
             printf("\n");
         }
     }
+    printf("Vote Casted Line: %d voters\n", voteCastedLine->numVoters);
+    if (voteCastedLine->head != NULL)
+    {
+        printf("Voters in Line: ");
+        Voter *currentVoter2 = voteCastedLine->head;
+        while (currentVoter2 != NULL)
+        {
+            printf("%d ", currentVoter2->id);
+            currentVoter2 = currentVoter2->next;
+        }
+        printf("\n");
+    }
 }
 
 int main()
@@ -102,6 +135,9 @@ int main()
     scanf("%d", &numVoters);
 
     Line *lines = (Line *)malloc(numLines * sizeof(Line));
+    Line *voteCastedLine = (Line *)malloc(sizeof(Line));
+    voteCastedLine->head = NULL;
+    voteCastedLine->numVoters = 0;
     for (int i = 0; i < numLines; i++)
     {
         lines[i] = *createLine(i + 1);
@@ -115,7 +151,7 @@ int main()
 
     while (numVoters > 0)
     {
-        displayStatus(lines, numLines);
+        displayStatus(lines, numLines, voteCastedLine);
 
         printf("\nEnter the line number where the voter wants to cast the vote: ");
         int chosenLine;
@@ -135,7 +171,7 @@ int main()
             continue;
         }
 
-        removeVoter(chosenLinePtr);
+        removeVoter(chosenLinePtr, chosenLinePtr->head->id, voteCastedLine);
         numVoters--;
         printf("Voter successfully cast the vote.\n");
     }
